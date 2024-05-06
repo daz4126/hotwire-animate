@@ -1,4 +1,4 @@
-export const animateCssClass = 'animate__animated'
+const animateCssClass = 'animate__animated'
 
 // On page load
 document.addEventListener('turbo:load', () => {
@@ -13,17 +13,19 @@ document.addEventListener('turbo:load', () => {
 // On template render
 document.addEventListener('turbo:before-stream-render', (event) => {
   // Animate in
-  if (event.target.firstElementChild instanceof HTMLTemplateElement) {
-    const element = event.target.templateElement.content.firstElementChild
-    const animationName = element.dataset.hwAnimateIn
+  if(event.target.templateElement.content.firstElementChild){
+    const element = event.target.templateElement.content.firstElementChild.firstElementChild
+    if (element) {
+      const animationName = element.dataset.hwAnimateIn
 
-    if (animationName) {
-      animateIn(element, animationName)
+      if (animationName) {
+        animateIn(element, animationName)
+      }
     }
   }
 
   // Animate out
-  const elementToRemove = document.getElementById(event.target.target)
+  const elementToRemove = document.getElementById(event.target.target).firstElementChild
   if (elementToRemove) {
     const exitAnimation = elementToRemove.dataset.hwAnimateOut
     if (exitAnimation) {
@@ -34,11 +36,11 @@ document.addEventListener('turbo:before-stream-render', (event) => {
   }
 })
 
-export function animateIn(element, animationName) {
+function animateIn(element, animationName) {
   element.classList.add(animateCssClass, buildAnimateClass(animationName))
 }
 
-export function animateOut(element, animationName, callback) {
+function animateOut(element, animationName, callback) {
   resetAnimationClasses(element)
   element.classList.add(animateCssClass, buildAnimateClass(animationName))
 
@@ -47,16 +49,13 @@ export function animateOut(element, animationName, callback) {
   })
 }
 
-export function resetAnimationClasses(element) {
+function resetAnimationClasses(element) {
   // remove all classes that begin with 'animate__' that aren't 'animate__animated'
   const classList = Array.from(element.classList)
   const newClassList = classList.filter((e) => e === 'animate__animated' || !e.startsWith('animate__'))
   element.classList = newClassList.join(' ')
 }
 
-export function buildAnimateClass(animationName) {
+function buildAnimateClass(animationName) {
   return `animate__${animationName}`
 }
-
-// Animate.css class name format
-// animate__animated animate__[name]
